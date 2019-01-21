@@ -9,3 +9,6 @@ https://www.onedataset.io/blog/2017/3/3/center-radial-bar-chart
 
 (yarn global add serve)
 serve
+
+
+http://bl.ocks.org/KoGor/5994804
