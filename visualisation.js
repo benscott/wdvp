@@ -1,9 +1,15 @@
-var svg = d3.select("svg"),
-    width = +svg.attr("width"),
-    height = +svg.attr("height"),
-    innerRadius = 180,
+var width = 960, height = 960
+
+var svg = d3.select("body").append("svg")
+    .attr("width", width)
+    .attr("height", height)
+
+var innerRadius = 180,
     outerRadius = Math.min(width, height) * 0.77,
     g = svg.append("g").attr("transform", "translate(" + width / 2 + "," + height * 0.78 + ")");
+
+
+
 
 var x = d3.scaleBand()
     .range([0, 2 * Math.PI])
@@ -15,7 +21,7 @@ var y = d3.scaleRadial()
 var z = d3.scaleOrdinal()
     .range(["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"]);
 
-var fileName = 'whr-data.csv';
+var fileName = './data/whr-data.csv';
 var labelColumn = 'Country'
 
 d3.csv(fileName, function (d, i, columns) {
@@ -29,7 +35,8 @@ d3.csv(fileName, function (d, i, columns) {
 }, function (error, data) {
     if (error) throw error;
 
-    console.log(data);
+    // console.log()
+    console.log(data)
 
     // weave(data, function (a, b) { return b[data.columns[6]] - a[data.columns[6]]; });
 
@@ -37,19 +44,40 @@ d3.csv(fileName, function (d, i, columns) {
     y.domain([0, d3.max(data, function (d) { return d.total; })]);
     z.domain(data.columns.slice(1));
 
+    var stack = d3.stack()
+        .keys(data.columns.slice(1))
+        .value(function (d, i) {
+            return d[i];
+        });
+
+    // console.log(data)
+
     g.append("g")
         .selectAll("g")
-        .data(d3.stack().keys(data.columns.slice(1))(data))
+        .data(stack(data))
         .enter().append("g")
-        .attr("fill", function (d) { return z(d.key); })
+        .attr("fill", function (d) {
+            return z(d.key);
+        })
         .selectAll("path")
         .data(function (d) { return d; })
         .enter().append("path")
         .attr("d", d3.arc()
-            .innerRadius(function (d) { return y(d[0]); })
-            .outerRadius(function (d) { return y(d[1]); })
-            .startAngle(function (d) { return x(d.data[labelColumn]); })
-            .endAngle(function (d) { return x(d.data[labelColumn]) + x.bandwidth(); })
+            .innerRadius(function (d) {
+                return y(d[0]);
+            })
+            .outerRadius(function (d) {
+                // console.log(y(d[1]));
+                return y(d[1]);
+            })
+            .startAngle(function (d) {
+
+                return x(d.data[labelColumn]);
+            })
+            .endAngle(function (d) {
+                // console.log(x(d.data[labelColumn]) + x.bandwidth())
+                return x(d.data[labelColumn]) + x.bandwidth();
+            })
             .padAngle(0.01)
             .padRadius(innerRadius));
 
@@ -61,9 +89,9 @@ d3.csv(fileName, function (d, i, columns) {
         .style('fill', 'white')
         .attr("transform", function (d) { return "rotate(" + ((x(d[labelColumn]) + x.bandwidth() / 2) * 180 / Math.PI - 90) + ")translate(" + outerRadius + ",0)"; });
 
-    // label.append("line")
-    //     .attr("x2", -5)
-    //     .attr("stroke", "#000");
+    // // label.append("line")
+    // //     .attr("x2", -5)
+    // //     .attr("stroke", "#000");
 
     label.append("text")
         .attr("transform", function (d) { return (x(d[labelColumn]) + x.bandwidth() / 2 + Math.PI / 2) % (2 * Math.PI) < Math.PI ? "rotate(0)translate(0,16)" : "rotate(-90)translate(0,-9)"; })

@@ -7,8 +7,15 @@
     <script src="https://d3js.org/d3.v4.js"></script>
     <script src="http://d3js.org/topojson.v1.min.js"></script>
     <script src="http://d3js.org/queue.v1.min.js"></script>
+    <script src="d3-scale-radial.js"></script>
 
     <style>
+        body {
+            background: #000;
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 9px;
+        }
+
         #countryTooltip {
             position: absolute;
             height: auto;
@@ -28,6 +35,10 @@
         .selected {
             fill: red !important;
         }
+
+        .map-background {
+            fill: #6CA8DA !important;
+        }
     </style>
 
 
@@ -35,14 +46,19 @@
 
 <body>
 
-    <!-- <script src="d3-scale-radial.js"></script>
-    <script src="./visualisation.js"></script> -->
+    <!-- <svg width="960" height="960" font-family="sans-serif" font-size="10"></svg> -->
+
+    <!-- <script src="./visualisation.js"></script> -->
 
     <script>
-        var width = 400,
-            height = 400,
-            dragSensitivity = 0.30; // Amount globe moves on drag
+        var dataset;
 
+        var width = 700,
+            height = 700,
+            dragSensitivity = 0.30, // Amount globe moves on drag. Posibly tweak based on size?
+            innerRadius = 120, // FIXME: For globe
+            outerRadius = Math.min(width, height) * 0.35,
+            mapScale = innerRadius - 2;
 
         var svg = d3.select("body").append("svg")
             .attr("width", width)
@@ -57,7 +73,7 @@
                 "rgb(116,196,118)", "rgb(49,163,84)", "rgb(0,109,44)"]);
 
         var projection = d3.geoOrthographic()
-            .scale(200)
+            .scale(mapScale)
             .rotate([0, 0])
             .translate([width / 2, height / 2])
             .clipAngle(90);
@@ -67,7 +83,7 @@
         var dragging = function (d) {
             var rotate = projection.rotate();
             projection.rotate([d3.event.x * dragSensitivity, -d3.event.y * dragSensitivity, rotate[2]]);
-            svg.selectAll("path").attr("d", path);
+            svg.selectAll("path.map").attr("d", path);
         }
 
         var subject = function (d) {
@@ -84,19 +100,6 @@
             })
             .on("drag", dragging);
 
-        //Create a container in which all pan-able elements will live
-        var map = svg.append("g")
-            .attr("id", "map")
-            .call(drag);  //Bind the dragging behavior
-
-        //Create a new, invisible background rect to catch drag events
-        map.append("rect")
-            .attr("x", 0)
-            .attr("y", 0)
-            .attr("width", width)
-            .attr("height", height)
-            .attr("opacity", 0);
-
         queue()
             .defer(d3.json, "./data/world-110m.json")
             .defer(d3.tsv, "./data/world-110m-country-names.tsv")
@@ -105,87 +108,217 @@
 
         function ready(error, worldTopologyData, countryNamesData, worldHappinessData) {
 
+            // Just throw an error if there's a problem
             if (error) throw error;
 
-            var dataset = topojson.feature(worldTopologyData, worldTopologyData.objects.countries).features;
+            dataset = topojson.feature(worldTopologyData, worldTopologyData.objects.countries).features;
 
             // Amalgamate all the data into one dataset
             countryNamesByID = {}
             countryNamesData.forEach(function (d) {
                 countryNamesByID[d.id] = d.name;
             });
+
             worldHappinessByName = {}
             worldHappinessData.forEach(function (d) {
                 worldHappinessByName[d['Country']] = d
             });
 
-            var countryName;
+            // FIXME: Remove vars
+            var countryName, countryHappiness, happinessBreakdown
             dataset.forEach(function (d, i) {
                 countryName = countryNamesByID[d.id];
+                countryHappiness = worldHappinessByName[countryName];
                 dataset[i]['properties']['name'] = countryName;
-                dataset[i]['properties']['happiness'] = worldHappinessByName[countryName];
+                dataset[i]['properties']['happiness'] = countryHappiness;
+
             });
 
-            color.domain([
-                d3.min(dataset, function (d) {
-                    if (typeof (d.properties.happiness) != 'undefined') {
-                        return d.properties.happiness['Happiness score'];
-                    }
+            radialStackedBar()
+            choroplethGlobe()
 
-                }),
-                d3.max(dataset, function (d) {
-                    if (typeof (d.properties.happiness) != 'undefined') {
-                        return d.properties.happiness['Happiness score'];
-                    }
-                })
-            ]);
+            function radialStackedBar() {
 
-            var world = map.selectAll("path")
-                .data(dataset)
-                .enter()
-                // .filter(function (d) {
-                //     return
-                // })
-                .append("path")
-                .attr("d", path)
-                // Choropleth
-                .style("fill", function (d) {
-                    if (typeof (d.properties.happiness) == 'undefined') {
-                        console.log(d.properties.name);
-                        return 'grey'
-                    }
-                    var value = d.properties.happiness['Happiness score'];
-                    return color(value);
-                })
-                // Event handlers
-                .on("mouseover", function (d) {
-                    if (d.properties.name) {
-                        //Get this bar's x/y values, then augment for the tooltip
-                        updateCountryTooltipPosition()
-                        //Update the tooltip text and value
-                        countryTooltip.text(d.properties.name).classed("hidden", false);
-                    }
+                g = svg.append("g").attr("transform", "translate(" + width / 2 + "," + height * 0.5 + ")");
 
-                })
-                .on("mouseout", function (d) {
-                    countryTooltip.classed("hidden", true);
-                })
-                .on("mousemove", function (d) {
-                    updateCountryTooltipPosition();
-                })
-                .on("click", function (d) {
-                    d3.selectAll('path.selected').classed("selected", false);
-                    d3.select(this).classed("selected", true);
+                var x = d3.scaleBand()
+                    .range([0, 2 * Math.PI])
+                    .align(0);
+
+                var y = d3.scaleRadial()
+                    .range([innerRadius, outerRadius]);
+
+                var z = d3.scaleOrdinal()
+                    .range(["#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"]);
+
+                var data = []
+                var columns = Object.keys(dataset[0]['properties']['happiness']);
+                var reservedColumns = [
+                    'Country',
+                    'Happiness score'
+                ]
+
+                data.columns = columns.filter(function (value) {
+                    return -1 === reservedColumns.indexOf(value)
                 });
-        }
 
-        var updateCountryTooltipPosition = function () {
-            var xPosition = d3.event.pageX + 7;
-            var yPosition = d3.event.pageY - 15;
-            countryTooltip.style("left", xPosition + "px")
-                .style("top", yPosition + "px")
-        }
+                dataset.forEach(function (d) {
+                    var countryHappiness;
+                    if (typeof (d.properties['happiness']) !== 'undefined') {
+                        countryHappiness = d.properties['happiness'];
+                        for (i = 0, total = 0; i < data.columns.length; ++i) {
+                            var column = data.columns[i];
+                            total += parseFloat(countryHappiness[column]);
+                        }
+                        // The explained total doesn't always match the happiness score
+                        // So bump it up a bit so it does
+                        if (total != countryHappiness['Happiness score']) {
+                            var diffFactor = countryHappiness['Happiness score'] / total
+                            for (i = 0, total = 0; i < data.columns.length; ++i) {
+                                var column = data.columns[i];
+                                countryHappiness[column] *= diffFactor
+                            }
+                        }
 
+                        countryHappiness['total'] = countryHappiness['Happiness score'];
+                        countryHappiness['name'] = d.properties['name'];
+                        data.push(countryHappiness)
+                    }
+                });
+
+                data.sort(function (a, b) { return b.total - a.total; });
+
+                x.domain(data.map(function (d) { return d['name']; }));
+
+                y.domain([0, d3.max(data, function (d) { return d.total; })]);
+
+                z.domain(data.columns);
+
+                var stack = d3.stack()
+                    .keys(data.columns)
+
+                g.append("g")
+                    .selectAll("g")
+                    .data(stack(data))
+                    .enter().append("g")
+                    .attr("fill", function (d) {
+                        return z(d.key);
+                    })
+                    .selectAll("path")
+                    .data(function (d) { return d; })
+                    .enter().append("path")
+                    .attr("d", d3.arc()
+                        .innerRadius(function (d) {
+                            return y(d[0]);
+                        })
+                        .outerRadius(function (d) {
+                            return y(d[1]);
+                        })
+                        .startAngle(function (d) {
+                            return x(d.data['name']);
+                        })
+                        .endAngle(function (d) {
+                            return x(d.data['name']) + x.bandwidth();
+                        })
+                        .padAngle(0.01)
+                        .padRadius(innerRadius));
+
+                outerRadius += 10
+
+                // var label = g.append("g")
+                //     .selectAll("g")
+                //     .data(data)
+                //     .enter().append("g")
+                //     .attr("text-anchor", "start")
+                //     .style('fill', 'white')
+                //     // .attr("text-anchor", "center")
+                //     .attr("transform", function (d) {
+                //         return "rotate(" + ((x(d.name) + x.bandwidth() / 2) * 180 / Math.PI - 90) + ")translate(" + outerRadius + ",0)";
+                //     });
+
+                // label.append("text")
+                //     .attr("transform", function (d) {
+                //         return (x(d.name) + x.bandwidth() / 2 + Math.PI / 2) % (2 * Math.PI) < Math.PI ? "rotate(0)translate(0,5)" : "rotate(0)translate(0,5)";
+                //     })
+                //     .text(function (d) { return d.name; });
+
+            }
+
+            // FIXME - This should be an object, with all the stuff before
+            // Files in an init() function, and then a build method
+            function choroplethGlobe() {
+
+                //Create a container in which all pan-able elements will live
+                var map = svg.append("g")
+                    .call(drag);  //Bind the dragging behavior
+
+
+                //Create a new, invisible background rect to catch drag events
+                map.append("circle")
+                    .attr("cx", width / 2)
+                    .attr("cy", height / 2)
+                    .attr("r", mapScale)
+                    .attr("class", "map-background")
+
+
+                color.domain([
+                    d3.min(dataset, function (d) {
+                        if (typeof (d.properties.happiness) != 'undefined') {
+                            return d.properties.happiness['Happiness score'];
+                        }
+
+                    }),
+                    d3.max(dataset, function (d) {
+                        if (typeof (d.properties.happiness) != 'undefined') {
+                            return d.properties.happiness['Happiness score'];
+                        }
+                    })
+                ]);
+
+                var world = map.selectAll("path")
+                    .data(dataset)
+                    .enter()
+                    .append("path")
+                    .attr("class", "map")
+                    .attr("d", path)
+                    // Choropleth
+                    .style("fill", function (d) {
+                        if (typeof (d.properties.happiness) == 'undefined') {
+                            return 'grey'
+                        }
+                        var value = d.properties.happiness['Happiness score'];
+                        return color(value);
+                    })
+                    // Event handlers
+                    .on("mouseover", function (d) {
+                        if (d.properties.name) {
+                            //Get this bar's x/y values, then augment for the tooltip
+                            updateCountryTooltipPosition()
+                            //Update the tooltip text and value
+                            countryTooltip.text(d.properties.name).classed("hidden", false);
+                        }
+
+                    })
+                    .on("mouseout", function (d) {
+                        countryTooltip.classed("hidden", true);
+                    })
+                    .on("mousemove", function (d) {
+                        updateCountryTooltipPosition();
+                    })
+                    .on("click", function (d) {
+                        d3.selectAll('path.selected').classed("selected", false);
+                        d3.select(this).classed("selected", true);
+                    });
+            }
+
+            var updateCountryTooltipPosition = function () {
+                var xPosition = d3.event.pageX + 7;
+                var yPosition = d3.event.pageY - 15;
+                countryTooltip.style("left", xPosition + "px")
+                    .style("top", yPosition + "px")
+            }
+
+        }
 
 
 
