@@ -11,7 +11,7 @@
 
     <style>
         body {
-            background: #000;
+            background: #020A10;
             font-family: Arial, Helvetica, sans-serif;
             font-size: 9px;
         }
@@ -37,7 +37,11 @@
         }
 
         .map-background {
-            fill: #6CA8DA !important;
+            fill: #0F2231 !important;
+        }
+
+        .country-276 {
+            fill: red !important;
         }
     </style>
 
@@ -149,7 +153,7 @@
                     .range([innerRadius, outerRadius]);
 
                 var z = d3.scaleOrdinal()
-                    .range(["#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"]);
+                    .range(["#9D7800", "#955C00", "#8A3C09", "#7A0022", '#800023', "#390E2D"]);
 
                 var data = []
                 var columns = Object.keys(dataset[0]['properties']['happiness']);
@@ -182,6 +186,7 @@
 
                         countryHappiness['total'] = countryHappiness['Happiness score'];
                         countryHappiness['name'] = d.properties['name'];
+                        countryHappiness['id'] = d.id;
                         data.push(countryHappiness)
                     }
                 });
@@ -207,6 +212,9 @@
                     .selectAll("path")
                     .data(function (d) { return d; })
                     .enter().append("path")
+                    .attr("class", function (d) {
+                        return 'country-' + d.data.id
+                    })
                     .attr("d", d3.arc()
                         .innerRadius(function (d) {
                             return y(d[0]);
@@ -225,22 +233,25 @@
 
                 outerRadius += 10
 
-                // var label = g.append("g")
-                //     .selectAll("g")
-                //     .data(data)
-                //     .enter().append("g")
-                //     .attr("text-anchor", "start")
-                //     .style('fill', 'white')
-                //     // .attr("text-anchor", "center")
-                //     .attr("transform", function (d) {
-                //         return "rotate(" + ((x(d.name) + x.bandwidth() / 2) * 180 / Math.PI - 90) + ")translate(" + outerRadius + ",0)";
-                //     });
+                var label = g.append("g")
+                    .selectAll("g")
+                    .data(data)
+                    .enter().append("g")
+                    .attr("text-anchor", "start")
+                    .attr("class", "label")
+                    .attr("class", function (d) {
+                        return 'country-' + d.id
+                    })
+                    .style('fill', '#8EA4B0')
+                    .attr("transform", function (d) {
+                        return "rotate(" + ((x(d.name) + x.bandwidth() / 2) * 180 / Math.PI - 90) + ")translate(" + outerRadius + ",0)";
+                    });
 
-                // label.append("text")
-                //     .attr("transform", function (d) {
-                //         return (x(d.name) + x.bandwidth() / 2 + Math.PI / 2) % (2 * Math.PI) < Math.PI ? "rotate(0)translate(0,5)" : "rotate(0)translate(0,5)";
-                //     })
-                //     .text(function (d) { return d.name; });
+                label.append("text")
+                    .attr("transform", function (d) {
+                        return (x(d.name) + x.bandwidth() / 2 + Math.PI / 2) % (2 * Math.PI) < Math.PI ? "rotate(0)translate(0,5)" : "rotate(0)translate(0,5)";
+                    })
+                    .text(function (d) { return d.name; });
 
             }
 
@@ -284,23 +295,30 @@
                     // Choropleth
                     .style("fill", function (d) {
                         if (typeof (d.properties.happiness) == 'undefined') {
-                            return 'grey'
+                            return '#08101D'
                         }
                         var value = d.properties.happiness['Happiness score'];
-                        return color(value);
+                        return '#08101D'
+                        // return color(value);
                     })
                     // Event handlers
                     .on("mouseover", function (d) {
                         if (d.properties.name) {
                             //Get this bar's x/y values, then augment for the tooltip
-                            updateCountryTooltipPosition()
+                            // updateCountryTooltipPosition()
                             //Update the tooltip text and value
-                            countryTooltip.text(d.properties.name).classed("hidden", false);
+                            // countryTooltip.text(d.properties.name).classed("hidden", false);
+                            d3.selectAll('.selected').classed("selected", false);
+                            d3.select(this).classed("selected", true);
+
+
+                            d3.selectAll('.country-' + d.id).style('filter', 'brightness(150%)')
                         }
 
                     })
                     .on("mouseout", function (d) {
                         countryTooltip.classed("hidden", true);
+                        d3.selectAll('.country-' + d.id).style('filter', 'brightness(100%)')
                     })
                     .on("mousemove", function (d) {
                         updateCountryTooltipPosition();
@@ -308,7 +326,7 @@
                     .on("click", function (d) {
                         d3.selectAll('path.selected').classed("selected", false);
                         d3.select(this).classed("selected", true);
-                    });
+                    })
             }
 
             var updateCountryTooltipPosition = function () {
