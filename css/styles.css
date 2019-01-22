@@ -50,7 +50,7 @@
             fill: #0F2231 !important;
         }
 
-        .hovered {
+        .highlight {
             filter: brightness(2)!important;
             /* -webkit-filter: brightness(125%);
             -moz-filter: brightness(125%);
@@ -59,7 +59,7 @@
              /* fill: #0F2231 !important; */
         }
 
-        .map.hovered {
+        .map.highlight {
             filter: brightness(100%);
             fill: #223644 !important;
         }
@@ -80,3 +80,10 @@
             background: red;
             border: 2px solid black;
         }
+
+
+        /* MAP */
+        path.map{
+            fill: #08101D !important;
+        }
+

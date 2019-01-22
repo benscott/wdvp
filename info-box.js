@@ -1,7 +1,7 @@
 function InfoBox() {
 
 
-    this.draw = function () {
+    this.showLegend = function () {
 
     }
 

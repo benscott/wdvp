@@ -17,45 +17,18 @@ function StackedBarChart(svg, innerRadius) {
         .range(["#9D7800", "#955C00", "#8A3C09", "#7A0022", '#800023', "#390E2D"]);
 
     this.draw = function () {
-
+        // Format dataset into the object expected by d3 radial scale
         var data = []
         data.columns = dataset.explainedByColumns;
-
         dataset.forEach(function (d) {
-            var obj = d.properties;
-            obj['id'] = d.id;
-            data.push(obj)
+            if (typeof (d.properties['total']) !== 'undefined') {
+                var obj = d.properties;
+                obj['id'] = d.id;
+                data.push(obj)
+            }
         });
 
-        console.log(data);
-        // var countryHappiness;
-        // if (typeof (d.properties['happiness']) !== 'undefined') {
-        //     countryHappiness = d.properties['happiness'];
-        //     for (i = 0, total = 0; i < data.columns.length; ++i) {
-        //         var column = data.columns[i];
-        //         total += parseFloat(countryHappiness[column]);
-        //     }
-        //     // The explained total doesn't always match the happiness score
-        //     // So bump it up a bit so it does
-        //     if (total != countryHappiness['Happiness score']) {
-        //         var diffFactor = countryHappiness['Happiness score'] / total
-        //         for (i = 0, total = 0; i < data.columns.length; ++i) {
-        //             var column = data.columns[i];
-        //             countryHappiness[column] *= diffFactor
-        //         }
-        //     }
-
-        //     countryHappiness['total'] = countryHappiness['Happiness score'];
-        //     countryHappiness['name'] = d.properties['name'];
-        //     countryHappiness['id'] = d.id;
-        //     countryHappiness['centroid'] = d3.geoCentroid(d);
-
-
-        //     data.push(countryHappiness)
-        // }
-
-
-        // data.sort(function (a, b) { return b.total - a.total; });
+        data.sort(function (a, b) { return b.total - a.total; });
 
         x.domain(data.map(function (d) { return d['name']; }));
 
