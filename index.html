@@ -9,53 +9,41 @@
     <script src="http://d3js.org/queue.v1.min.js"></script>
     <script src="d3-scale-radial.js"></script>
 
-    <style>
-        body {
-            background: #020A10;
-            font-family: Arial, Helvetica, sans-serif;
-            font-size: 9px;
-        }
-
-        #countryTooltip {
-            position: absolute;
-            height: auto;
-            padding: 10px;
-            background-color: white;
-            pointer-events: none;
-            border: solid #ccc 1px;
-            color: #666;
-            font-size: 14px;
-            font-family: sans-serif;
-        }
-
-        #countryTooltip.hidden {
-            display: none;
-        }
-
-        .selected {
-            fill: red !important;
-        }
-
-        .map-background {
-            fill: #0F2231 !important;
-        }
-
-        .country-276 {
-            fill: red !important;
-        }
-    </style>
-
+    <link rel="stylesheet" href="css/styles.css">
 
 </head>
 
 <body>
 
+    <div class="wrapper">
+        <div class="col-1">
+            <svg width="700" height="700" id="chart"></svg>
+        </div>
+        <div class="col-2">
+            <div>
+                <h1>World Happiness</h1>
+                <h2>What makes a country happy?</h2>
+                <div width="200" height="700" id="info-box"></div>
+            </div>
+        </div>
+    </div>
+
     <!-- <svg width="960" height="960" font-family="sans-serif" font-size="10"></svg> -->
 
     <!-- <script src="./visualisation.js"></script> -->
 
+
+
     <script>
         var dataset;
+
+        var svg = d3.select("svg#chart"),
+            width = +svg.attr("width"),
+            height = +svg.attr("height");
+
+        var svgInfoBox = d3.select("svg#info-box"),
+            width = +svg.attr("width"),
+            height = +svg.attr("height");
 
         var width = 700,
             height = 700,
@@ -64,9 +52,9 @@
             outerRadius = Math.min(width, height) * 0.35,
             mapScale = innerRadius - 2;
 
-        var svg = d3.select("body").append("svg")
-            .attr("width", width)
-            .attr("height", height)
+        // var svg = d3.select("body").append("svg")
+        //     .attr("width", width)
+        //     .attr("height", height)
 
         var countryTooltip = d3.select("body").append("div")
             .attr("id", "countryTooltip")
@@ -135,11 +123,15 @@
                 countryHappiness = worldHappinessByName[countryName];
                 dataset[i]['properties']['name'] = countryName;
                 dataset[i]['properties']['happiness'] = countryHappiness;
-
             });
+
+            // FIXME: Yuk!!
+            var data = []
+            var z
 
             radialStackedBar()
             choroplethGlobe()
+            onSelectCountry()
 
             function radialStackedBar() {
 
@@ -152,10 +144,9 @@
                 var y = d3.scaleRadial()
                     .range([innerRadius, outerRadius]);
 
-                var z = d3.scaleOrdinal()
+                z = d3.scaleOrdinal()
                     .range(["#9D7800", "#955C00", "#8A3C09", "#7A0022", '#800023', "#390E2D"]);
 
-                var data = []
                 var columns = Object.keys(dataset[0]['properties']['happiness']);
                 var reservedColumns = [
                     'Country',
@@ -187,6 +178,9 @@
                         countryHappiness['total'] = countryHappiness['Happiness score'];
                         countryHappiness['name'] = d.properties['name'];
                         countryHappiness['id'] = d.id;
+                        countryHappiness['centroid'] = d3.geoCentroid(d);
+
+
                         data.push(countryHappiness)
                     }
                 });
@@ -215,6 +209,13 @@
                     .attr("class", function (d) {
                         return 'country-' + d.data.id
                     })
+                    .on("mouseover", function (d) {
+                        rotateMapToCentroid(d.data.centroid)
+                        onHoverCountry(d.data)
+                    })
+                    .on("mouseout", function (d) {
+                        onHoverOutCountry(d.data)
+                    })
                     .attr("d", d3.arc()
                         .innerRadius(function (d) {
                             return y(d[0]);
@@ -229,7 +230,8 @@
                             return x(d.data['name']) + x.bandwidth();
                         })
                         .padAngle(0.01)
-                        .padRadius(innerRadius));
+                        .padRadius(innerRadius)
+                    );
 
                 outerRadius += 10
 
@@ -238,20 +240,25 @@
                     .data(data)
                     .enter().append("g")
                     .attr("text-anchor", "start")
-                    .attr("class", "label")
                     .attr("class", function (d) {
-                        return 'country-' + d.id
+                        return 'label country-' + d.id
                     })
-                    .style('fill', '#8EA4B0')
                     .attr("transform", function (d) {
                         return "rotate(" + ((x(d.name) + x.bandwidth() / 2) * 180 / Math.PI - 90) + ")translate(" + outerRadius + ",0)";
-                    });
+                    })
+                    .on("mouseover", function (d) {
+                        rotateMapToCentroid(d.centroid)
+                        onHoverCountry(d)
+                    })
+                    .on("mouseout", function (d) {
+                        onHoverOutCountry(d)
+                    })
 
                 label.append("text")
                     .attr("transform", function (d) {
                         return (x(d.name) + x.bandwidth() / 2 + Math.PI / 2) % (2 * Math.PI) < Math.PI ? "rotate(0)translate(0,5)" : "rotate(0)translate(0,5)";
                     })
-                    .text(function (d) { return d.name; });
+                    .text(function (d) { return d.name; })
 
             }
 
@@ -263,14 +270,12 @@
                 var map = svg.append("g")
                     .call(drag);  //Bind the dragging behavior
 
-
                 //Create a new, invisible background rect to catch drag events
                 map.append("circle")
                     .attr("cx", width / 2)
                     .attr("cy", height / 2)
                     .attr("r", mapScale)
                     .attr("class", "map-background")
-
 
                 color.domain([
                     d3.min(dataset, function (d) {
@@ -290,8 +295,10 @@
                     .data(dataset)
                     .enter()
                     .append("path")
-                    .attr("class", "map")
                     .attr("d", path)
+                    .attr("class", function (d) {
+                        return 'map country-' + d.id
+                    })
                     // Choropleth
                     .style("fill", function (d) {
                         if (typeof (d.properties.happiness) == 'undefined') {
@@ -304,36 +311,76 @@
                     // Event handlers
                     .on("mouseover", function (d) {
                         if (d.properties.name) {
-                            //Get this bar's x/y values, then augment for the tooltip
-                            // updateCountryTooltipPosition()
-                            //Update the tooltip text and value
-                            // countryTooltip.text(d.properties.name).classed("hidden", false);
-                            d3.selectAll('.selected').classed("selected", false);
-                            d3.select(this).classed("selected", true);
-
-
-                            d3.selectAll('.country-' + d.id).style('filter', 'brightness(150%)')
+                            onHoverCountry(d)
                         }
 
                     })
                     .on("mouseout", function (d) {
-                        countryTooltip.classed("hidden", true);
-                        d3.selectAll('.country-' + d.id).style('filter', 'brightness(100%)')
-                    })
-                    .on("mousemove", function (d) {
-                        updateCountryTooltipPosition();
+                        onHoverOutCountry(d)
+
                     })
                     .on("click", function (d) {
-                        d3.selectAll('path.selected').classed("selected", false);
-                        d3.select(this).classed("selected", true);
+                        onSelectCountry(d);
                     })
             }
 
-            var updateCountryTooltipPosition = function () {
-                var xPosition = d3.event.pageX + 7;
-                var yPosition = d3.event.pageY - 15;
-                countryTooltip.style("left", xPosition + "px")
-                    .style("top", yPosition + "px")
+            // var updateCountryTooltipPosition = function () {
+            //     var xPosition = d3.event.pageX + 7;
+            //     var yPosition = d3.event.pageY - 15;
+            //     countryTooltip.style("left", xPosition + "px")
+            //         .style("top", yPosition + "px")
+            // }
+
+            var onHoverCountry = function (d) {
+                d3.selectAll('.hovered').classed("hovered", false);
+                d3.selectAll('.country-' + d.id).classed("hovered", true);
+            }
+
+            var onHoverOutCountry = function (d) {
+                d3.selectAll('.hovered').classed("hovered", false);
+            }
+
+            var rotateMapToCentroid = function (centroid) {
+                (function transition() {
+                    d3.transition()
+                        .duration(1500)
+                        .tween("rotate", function () {
+                            var r = d3.interpolate(projection.rotate(), [-centroid[0], -centroid[1]]);
+                            return function (t) {
+                                projection.rotate(r(t));
+                                svg.selectAll("path.map").attr("d", path)
+                            };
+                        })
+                })();
+            }
+
+            function onSelectCountry(d) {
+
+                var d2 = [4, 8, 15, 16, 23, 42];
+
+                // // var x = d3.scale.linear()
+                // //     .domain([0, d3.max(data)])
+                // //     .range([0, 200]);
+
+                // // for (i = 0; i < data.columns.length; ++i) {
+                // //     var column = data.columns[i]
+                // //     var colour = z(column)
+                // // }
+
+                var scale = d3.scaleLinear();
+
+                d3.select("#info-box")
+                    .selectAll("div")
+                    .data(d2)
+                    .enter()
+                    .append("div")
+                    .attr("class", "bar");
+
+
+
+                // var data = [4, 8, 15, 16, 23, 42];
+
+
             }
 
         }
