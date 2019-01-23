@@ -19,22 +19,23 @@
 <body>
 
     <div class="wrapper">
-        <div class="col-1">
+        <div class="col-1" id="visualisation">
             <svg width="700" height="700"></svg>
         </div>
-        <div class="col-2">
-            <div>
-                <h1>World Happiness</h1>
-                <h2>What makes a country happy?</h2>
-                <div width="200" height="700" id="info-box"></div>
-            </div>
+        <div class="col-2" id="legend">
+            <h1>World Happiness</h1>
+            <h4>What makes a country happy?</h4>
+            <h2></h2>
+            <h3></h3>
+            Explained by:
+            <svg width="300" height="700"></svg>
         </div>
     </div>
 
     <script>
         var dataset;
 
-        var svg = d3.select("svg"),
+        var svg = d3.select("#visualisation svg"),
             innerRadius = 120;
 
         var globe = new Globe(svg, innerRadius - 2)
@@ -54,8 +55,8 @@
             globe.rotateToCentroid(centroid);
         }
 
-        function showCountryInfo(d) {
-            // infoBox.draw(d)
+        function showCountryInfo(d, i) {
+            infoBox.showCountry(d, i)
         }
 
         queue()

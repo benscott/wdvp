@@ -1,5 +1,5 @@
         body {
-            background: #020A10;
+            background: #000F1A;
             font-family: "Gill Sans", Arial, Helvetica, sans-serif;
             /* font-size: 9px; */
             color: #fff;
@@ -26,7 +26,7 @@
             /* border-bottom: 5px solid #fff; */
         }
 
-        #countryTooltip {
+        /* #countryTooltip {
             position: absolute;
             height: auto;
             padding: 10px;
@@ -40,7 +40,7 @@
 
         #countryTooltip.hidden {
             display: none;
-        }
+        } */
 
         .selected {
             fill: red !important;
@@ -48,6 +48,18 @@
 
         .map-background {
             fill: #0F2231 !important;
+
+            fill: #002948 !important;
+
+
+        }
+
+        .map-background2 {
+            fill: #001625 !important;
+
+
+
+
         }
 
         .highlight {
@@ -77,7 +89,7 @@
         .bar{
             /* width: 100px; */
             height: 20px;
-            background: red;
+            /* background: red; */
             border: 2px solid black;
         }
 
@@ -87,3 +99,21 @@
             fill: #08101D !important;
         }
 
+        /* #legend{
+            height: 300px;
+            border: 1px solid pink;
+        }
+
+        #country-info, #legend{
+            background: teal;
+        } */
+
+        #legend .title {
+            font-size: 16px;
+            fill: #fff!important;
+        }
+
+        #legend .label {
+            font-size: 16px;
+            fill: #fff!important;
+        }

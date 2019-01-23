@@ -16,6 +16,10 @@ function StackedBarChart(svg, innerRadius) {
     var z = d3.scaleOrdinal()
         .range(["#9D7800", "#955C00", "#8A3C09", "#7A0022", '#800023', "#390E2D"]);
 
+    this.getFill = function (key) {
+        return z(key);
+    }
+
     this.draw = function () {
         // Format dataset into the object expected by d3 radial scale
         var data = []
@@ -59,8 +63,8 @@ function StackedBarChart(svg, innerRadius) {
             .on("mouseout", function (d) {
                 unHighlightCountry(d.data)
             })
-            .on("click", function (d) {
-                showCountryInfo(d.data)
+            .on("click", function (d, i) {
+                showCountryInfo(d.data, i)
             })
             .attr("d", d3.arc()
                 .innerRadius(function (d) {
@@ -99,8 +103,8 @@ function StackedBarChart(svg, innerRadius) {
             .on("mouseout", function (d) {
                 unHighlightCountry(d)
             })
-            .on("click", function (d) {
-                showCountryInfo(d)
+            .on("click", function (d, i) {
+                showCountryInfo(d, i)
             })
 
         label.append("text")

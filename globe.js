@@ -61,9 +61,10 @@ function Globe(svg, radius) {
             .on("mouseout", function (d) {
                 unHighlightCountry(d)
             })
-            .on("click", function (d) {
-                showCountryInfo(d)
+            .on("click", function (d, i) {
+                showCountryInfo(d.properties, i)
             })
+
     }
 
     this.rotateToCentroid = function (centroid) {
