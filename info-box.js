@@ -128,16 +128,18 @@ function InfoBox() {
         // d3.select("#legend").remove()
     }
 
-    this.showCountry = function (country, i) {
+    this.showCountry = function (country) {
 
-        d3.select("#legend h2").html(country.name + '<span>#' + i + '</span>');
-        d3.select("#legend h3").text(country.total);
+        var properties = country.properties
+
+        d3.select("#legend h2").html(properties.name + '<span>#' + properties.rank + '</span>');
+        d3.select("#legend h3").text(properties.happinessScore);
 
         data = []
         dataset.explainedByColumns.forEach(function (column) {
             data.push({
                 key: column,
-                value: country[column]
+                value: properties[column]
             })
         });
 

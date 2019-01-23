@@ -79,7 +79,8 @@
             });
 
             worldHappinessByName = {}
-            worldHappinessData.forEach(function (d) {
+            worldHappinessData.forEach(function (d, i) {
+                d['rank'] = i;
                 worldHappinessByName[d['Country']] = d
             });
 
@@ -93,22 +94,15 @@
                 dataset[i]['properties']['centroid'] = d3.geoCentroid(d);
 
                 if (typeof (countryHappiness) !== 'undefined') {
-                    dataset[i]['properties']['total'] = parseFloat(countryHappiness['Happiness score']);
+                    dataset[i]['properties']['happinessScore'] = parseFloat(countryHappiness['Happiness score']);
+                    dataset[i]['properties']['rank'] = parseFloat(countryHappiness['rank']) + 1;
                     var total = 0;
                     dataset.explainedByColumns.forEach(function (column) {
                         dataset[i]['properties'][column] = parseFloat(countryHappiness[column]);
                         total += dataset[i]['properties'][column];
                     });
-                    // Ensure sum of all explainedCols match the total happiness score
-                    // If not, normalise the values
-                    if (total != dataset[i]['properties']['total']) {
-                        var diferential = dataset[i]['properties']['total'] / total
-                        dataset.explainedByColumns.forEach(function (column) {
-                            dataset[i]['properties'][column] *= diferential
-                        });
-                    }
+                    dataset[i]['properties']['explainedByTotal'] = total
                 }
-
             });
 
             globe.draw()

@@ -24,19 +24,28 @@ function StackedBarChart(svg, innerRadius) {
         // Format dataset into the object expected by d3 radial scale
         var data = []
         data.columns = dataset.explainedByColumns;
-        dataset.forEach(function (d) {
-            if (typeof (d.properties['total']) !== 'undefined') {
+        dataset.forEach(function (d, i) {
+            if (typeof (d.properties['happinessScore']) !== 'undefined') {
                 var obj = d.properties;
+                // Ensure sum of all explainedCols match the total happiness score
+                // If not, normalise the values
+                if (obj['explainedByTotal'] != obj['happinessScore']) {
+                    var diferential = d.properties['happinessScore'] / obj['explainedByTotal']
+                    data.columns.forEach(function (column) {
+                        obj[column] *= diferential
+                    });
+                }
                 obj['id'] = d.id;
+                obj['dataset_index'] = i;
                 data.push(obj)
             }
         });
 
-        data.sort(function (a, b) { return b.total - a.total; });
+        data.sort(function (a, b) { return b.happinessScore - a.happinessScore; });
 
         x.domain(data.map(function (d) { return d['name']; }));
 
-        y.domain([0, d3.max(data, function (d) { return d.total; })]);
+        y.domain([0, d3.max(data, function (d) { return d.happinessScore; })]);
 
         z.domain(data.columns);
 
@@ -63,8 +72,8 @@ function StackedBarChart(svg, innerRadius) {
             .on("mouseout", function (d) {
                 unHighlightCountry(d.data)
             })
-            .on("click", function (d, i) {
-                showCountryInfo(d.data, i)
+            .on("click", function (d) {
+                showCountryInfo(dataset[d.data.dataset_index])
             })
             .attr("d", d3.arc()
                 .innerRadius(function (d) {
@@ -103,8 +112,8 @@ function StackedBarChart(svg, innerRadius) {
             .on("mouseout", function (d) {
                 unHighlightCountry(d)
             })
-            .on("click", function (d, i) {
-                showCountryInfo(d, i)
+            .on("click", function (d) {
+                showCountryInfo(dataset[d.dataset_index])
             })
 
         label.append("text")
