@@ -1,12 +1,5 @@
 
 :root {
-    /* --yellow: #9D7800;
-    --light-orange: #955C00;
-    --orange: #8a3c09;
-    --red: #7A0022;
-    --magenta: #800023;
-    --purple: #390E2D;
-    --text-grey: #8EA4B0; */
     --yellow: #D8A500;
     --light-orange: #D58200;
     --orange: #D04400;
@@ -32,7 +25,7 @@ body {
 
 h1{
     color: #fff;
-    font-size: 30px;
+    font-size: 32px;
     /* border-bottom: 1px solid #fff; */
     text-transform: uppercase;
     margin: 0 0 20px 0;
