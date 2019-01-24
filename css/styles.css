@@ -1,20 +1,60 @@
+
+:root {
+    --yellow: #9D7800;
+    --light-orange: #955C00;
+    --orange: #8a3c09;
+    --red: #7A0022;
+    --magenta: #800023;
+    --purple: #390E2D;
+    --text-grey: #8EA4B0;
+}
+
         body {
             background: #000F1A;
             font-family: "Gill Sans", Arial, Helvetica, sans-serif;
-            /* font-size: 9px; */
-            color: #fff;
+            font-size: 9px;
+            color: var(--text-grey);
+        }
+
+        #info-box{
+            float: left;
+        }
+
+        .yellow{
+            fill: #9D7800
+        }
+
+        .light-orange{
+            fill: #955C00
+        }
+
+        .orange{
+            fill: #8A3C09
+        }
+
+        .red{
+            fill: #7A0022
+        }
+
+        .magenta{
+            fill: #800023
+        }
+
+        .purple{
+            fill: #390E2D
         }
 
         /* Grid layout */
 
-        .wrapper {
+        /* .wrapper {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             grid-gap: 10px;
             grid-auto-rows: minmax(100px, auto);
-        }
+        } */
 
         h1{
+            color: #fff;
             font-size: 30px;
             border-bottom: 2px solid #fff;
             text-transform: uppercase;
@@ -117,3 +157,91 @@
             font-size: 16px;
             fill: #fff!important;
         }
+
+#legend{
+    margin: 40px 20px;
+    position: absolute;
+    top: 50px;
+}
+
+ /* Customize the label (the container) */
+.container {
+  display: block;
+  position: relative;
+  padding-left: 25px;
+  margin-bottom: 0px;
+  cursor: pointer;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  height: 20px;
+  line-height: 16px;
+}
+
+/* Hide the browser's default checkbox */
+.container input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
+
+/* Create a custom checkbox */
+.checkmark {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 15px;
+  width: 15px;
+  /* background-color: #eee; */
+}
+
+.yellow .checkmark {
+    background-color: var(--yellow);
+}
+
+.light-orange .checkmark {
+    background-color: var(--light-orange);
+}
+
+.orange .checkmark {
+    background-color: var(--orange);
+}
+
+.red .checkmark {
+    background-color: var(--red);
+}
+
+.magenta .checkmark {
+    background-color: var(--magenta);
+}
+
+.purple .checkmark {
+    background-color: var(--purple);
+}
+
+/* Create the checkmark/indicator (hidden when not checked) */
+.checkmark:after {
+  content: "";
+  position: absolute;
+  display: none;
+}
+
+.selected .checkmark:after {
+  display: block;
+}
+
+.container .checkmark:after {
+  left: 5px;
+  top: 1px;
+  width: 4px;
+  height: 8px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  -webkit-transform: rotate(45deg);
+  -ms-transform: rotate(45deg);
+  transform: rotate(45deg);
+  opacity: 0.4;
+}

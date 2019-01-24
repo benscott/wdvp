@@ -7,40 +7,35 @@
     <script src="https://d3js.org/d3.v4.js"></script>
     <script src="http://d3js.org/topojson.v1.min.js"></script>
     <script src="http://d3js.org/queue.v1.min.js"></script>
+    <script src="./js/core.min.js"></script>
     <script src="d3-scale-radial.js"></script>
     <script src="./globe.js"></script>
     <script src="./stacked-bar-chart.js"></script>
-    <script src="./info-box.js"></script>
-
+    <script src="./legend.js"></script>
     <link rel="stylesheet" href="css/styles.css">
 
 </head>
 
 <body>
 
-    <div class="wrapper">
-        <div class="col-1" id="visualisation">
-            <svg width="700" height="700"></svg>
-        </div>
-        <div class="col-2" id="legend">
-            <h1>World Happiness</h1>
-            <h4>What makes a country happy?</h4>
-            <h2></h2>
-            <h3></h3>
-            Explained by:
-            <svg width="300" height="700"></svg>
-        </div>
+
+    <h1>A world of happiness</h1>
+    <!-- <h2>According to xx, these factors combined bring us happiness. Explore the map to see how your country measure up?</h2> -->
+    <div id="legend"></div>
+
+    <div>
+        <svg width="700" height="700"></svg>
     </div>
 
     <script>
         var dataset;
 
-        var svg = d3.select("#visualisation svg"),
+        var svg = d3.select("svg"),
             innerRadius = 120;
 
         var globe = new Globe(svg, innerRadius - 2)
         var bar = new StackedBarChart(svg, innerRadius)
-        var infoBox = new InfoBox()
+        var legend = new Legend()
 
         function highlightCountry(d) {
             d3.selectAll('.highlight').classed("highlight", false);
@@ -53,10 +48,6 @@
 
         function rotateMapToCentroid(centroid) {
             globe.rotateToCentroid(centroid);
-        }
-
-        function showCountryInfo(d, i) {
-            infoBox.showCountry(d, i)
         }
 
         queue()
@@ -107,7 +98,7 @@
 
             globe.draw()
             bar.draw()
-            infoBox.showLegend()
+
 
         }
 
