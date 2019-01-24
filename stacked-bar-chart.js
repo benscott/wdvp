@@ -1,8 +1,10 @@
 function StackedBarChart(svg, innerRadius) {
 
+    var self = this;
     var width = +svg.attr("width");
     var height = +svg.attr("height");
     var outerRadius = Math.min(width, height) * 0.35;
+    var data = [];
 
     g = svg.append("g").attr("transform", "translate(" + width / 2 + "," + height * 0.5 + ")");
 
@@ -14,15 +16,10 @@ function StackedBarChart(svg, innerRadius) {
         .range([innerRadius, outerRadius]);
 
     var z = d3.scaleOrdinal()
-        .range(["#9D7800", "#955C00", "#8A3C09", "#7A0022", '#800023', "#390E2D"]);
-
-    this.getFill = function (key) {
-        return z(key);
-    }
+        .range(["yellow", "light-orange", "orange", "red", 'magenta', "purple"]);
 
     this.draw = function () {
         // Format dataset into the object expected by d3 radial scale
-        var data = []
         data.columns = dataset.explainedByColumns;
         dataset.forEach(function (d, i) {
             if (typeof (d.properties['happinessScore']) !== 'undefined') {
@@ -36,7 +33,6 @@ function StackedBarChart(svg, innerRadius) {
                     });
                 }
                 obj['id'] = d.id;
-                obj['dataset_index'] = i;
                 data.push(obj)
             }
         });
@@ -52,18 +48,35 @@ function StackedBarChart(svg, innerRadius) {
         var stack = d3.stack()
             .keys(data.columns)
 
-        g.append("g")
-            .selectAll("g")
+        svg.append("g")
+            .attr("class", "legendOrdinal")
+            .attr("transform", "translate(20,20)");
+
+        var legend = d3.legendColor()
+            .labelFormat(d3.format(".2f"))
+            .useClass(true)
+            .scale(z)
+            .on("cellclick", function (d) {
+                self.filter(d)
+            });
+
+        svg.select(".legendOrdinal")
+            .call(legend);
+
+        g.selectAll("g.bars")
             .data(stack(data))
             .enter().append("g")
             .attr("fill", function (d) {
-                return z(d.key);
+                return;
+            })
+            .attr("class", function (d) {
+                return 'bar-group ' + z(d.key)
             })
             .selectAll("path")
             .data(function (d) { return d; })
             .enter().append("path")
             .attr("class", function (d) {
-                return 'country-' + d.data.id
+                return 'country-' + d.data.id;
             })
             .on("mouseover", function (d) {
                 rotateMapToCentroid(d.data.centroid)
@@ -71,9 +84,6 @@ function StackedBarChart(svg, innerRadius) {
             })
             .on("mouseout", function (d) {
                 unHighlightCountry(d.data)
-            })
-            .on("click", function (d) {
-                showCountryInfo(dataset[d.data.dataset_index])
             })
             .attr("d", d3.arc()
                 .innerRadius(function (d) {
@@ -94,35 +104,54 @@ function StackedBarChart(svg, innerRadius) {
 
         outerRadius += 10
 
-        var label = g.append("g")
-            .selectAll("g")
-            .data(data)
-            .enter().append("g")
-            .attr("text-anchor", "start")
-            .attr("class", function (d) {
-                return 'label country-' + d.id
-            })
-            .attr("transform", function (d) {
-                return "rotate(" + ((x(d.name) + x.bandwidth() / 2) * 180 / Math.PI - 90) + ")translate(" + outerRadius + ",0)";
-            })
-            .on("mouseover", function (d) {
-                rotateMapToCentroid(d.centroid)
-                highlightCountry(d)
-            })
-            .on("mouseout", function (d) {
-                unHighlightCountry(d)
-            })
-            .on("click", function (d) {
-                showCountryInfo(dataset[d.dataset_index])
-            })
+        // var label = g.append("g")
+        //     .selectAll("g")
+        //     .data(data)
+        //     .enter().append("g")
+        //     .attr("text-anchor", "start")
+        //     .attr("class", function (d) {
+        //         return 'label country-' + d.id
+        //     })
+        //     .attr("transform", function (d) {
+        //         return "rotate(" + ((x(d.name) + x.bandwidth() / 2) * 180 / Math.PI - 90) + ")translate(" + outerRadius + ",0)";
+        //     })
+        //     .on("mouseover", function (d) {
+        //         rotateMapToCentroid(d.centroid)
+        //         highlightCountry(d)
+        //     })
+        //     .on("mouseout", function (d) {
+        //         unHighlightCountry(d)
+        //     })
 
-        label.append("text")
-            .attr("transform", function (d) {
-                return (x(d.name) + x.bandwidth() / 2 + Math.PI / 2) % (2 * Math.PI) < Math.PI ? "rotate(0)translate(0,5)" : "rotate(0)translate(0,5)";
-            })
-            .text(function (d) { return d.name; })
+        // label.append("text")
+        //     .attr("transform", function (d) {
+        //         return (x(d.name) + x.bandwidth() / 2 + Math.PI / 2) % (2 * Math.PI) < Math.PI ? "rotate(0)translate(0,5)" : "rotate(0)translate(0,5)";
+        //     })
+        //     .text(function (d) { return d.name; })
 
 
+
+    }
+
+    this.filter = function (category) {
+        // data.columns = [d]
+        var stack = d3.stack()
+            .keys(data.columns)
+
+        data.sort(function (a, b) { return b[category] - a[category]; });
+
+        // console.log(stack(data));
+
+        // console.log(g.selectAll("g")
+        //     .data(stack(data))
+        //     .selectAll("path"))
+
+        // g.selectAll("g.bars")
+        //     .data(stack(data))
+        //     // .selectAll("path")
+        //     // .data(function (d) { return d; })
+        //     .exit()
+        //     .remove()
 
     }
 

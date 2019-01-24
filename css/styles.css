@@ -5,14 +5,42 @@
             color: #fff;
         }
 
+        #info-box{
+            float: left;
+        }
+
+        .yellow{
+            fill: #9D7800
+        }
+
+        .light-orange{
+            fill: #955C00
+        }
+
+        .orange{
+            fill: #8A3C09
+        }
+
+        .red{
+            fill: #7A0022
+        }
+
+        .magenta{
+            fill: #800023
+        }
+
+        .purple{
+            fill: #390E2D
+        }
+
         /* Grid layout */
 
-        .wrapper {
+        /* .wrapper {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             grid-gap: 10px;
             grid-auto-rows: minmax(100px, auto);
-        }
+        } */
 
         h1{
             font-size: 30px;
