@@ -1,11 +1,18 @@
 
 :root {
-    --yellow: #9D7800;
+    /* --yellow: #9D7800;
     --light-orange: #955C00;
     --orange: #8a3c09;
     --red: #7A0022;
     --magenta: #800023;
     --purple: #390E2D;
+    --text-grey: #8EA4B0; */
+    --yellow: #D8A500;
+    --light-orange: #D58200;
+    --orange: #D04400;
+    --red: #9A121E;
+    --magenta: #900C3E;
+    --purple: #571845;
     --text-grey: #8EA4B0;
 }
 
@@ -105,27 +112,27 @@ path.map {
 /* Selected */
 
 .bar-group.yellow .highlight{
-    fill: #FFF200;
+    fill: #E4C04D;
 }
 
 .bar-group.light-orange .highlight{
-    fill: #FFB900;
+    fill: #E3A84D;
 }
 
 .bar-group.orange .highlight{
-    fill: #FF7800;
+    fill: #DF7B4D;
 }
 
 .bar-group.red .highlight{
-    fill: #F7003F;
+    fill: #B9575E;
 }
 
 .bar-group.magenta .highlight{
-    fill: #FF0040;
+    fill: #B25177;
 }
 
 .bar-group.purple .highlight{
-    fill: #73195B;
+    fill: #8A5C7D;
 }
 
  /* Customize the label (the container) */
