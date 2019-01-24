@@ -37,10 +37,10 @@ function StackedBarChart(svg, innerRadius) {
                 var label = d3.select(this).select('label')
                 var select = !label.classed("selected")
                 // Don't alow all the options to be completely deselected
-                if (countSelected > 1 || select) {
-                    label.classed("selected", select)
-                    select ? self.removeFilter(d) : self.addFilter(d)
-                }
+                // if (countSelected > 1 || select) {
+                label.classed("selected", select)
+                select ? self.removeFilter(d) : self.addFilter(d)
+                // }
 
             })
     }

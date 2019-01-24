@@ -12,7 +12,7 @@
 body {
     background: #000F1A;
     font-family: "Gill Sans", Arial, Helvetica, sans-serif;
-    font-size: 9px;
+    font-size: 12px;
     color: var(--text-grey);
 }
 
@@ -25,15 +25,15 @@ body {
 
 h1{
     color: #fff;
-    font-size: 22px;
-    border-bottom: 1px solid #fff;
+    font-size: 30px;
+    /* border-bottom: 1px solid #fff; */
     text-transform: uppercase;
     margin: 0 0 20px 0;
 }
 
 p{
-    font-size: 14px;
-    width: 300px;
+    font-size: 15px;
+    width: 320px;
 }
 
 #legend{
@@ -41,14 +41,16 @@ p{
 }
 
 #visualisation{
-    margin-left: 120px;
+    margin-left: 300px;
     text-align: center;
     position: relative;
     z-index: 999;
+    max-width: 900px;
 }
 
 /* Labels */
 .label {
+    font-size: 9px;
     fill: #8EA4B0;
 }
 .highlight.label{
