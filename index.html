@@ -12,18 +12,21 @@
     <script src="./globe.js"></script>
     <script src="./stacked-bar-chart.js"></script>
     <script src="./legend.js"></script>
+
     <link rel="stylesheet" href="css/styles.css">
 
 </head>
 
 <body>
 
+    <div id="header">
+        <h1>A world of happiness</h1>
+        <p>According to the UN World Happiness Report, these factors combined contribute to national happiness.</p>
+        <p>Explore the globe and see how your country measures up.</p>
+        <div id="legend"></div>
+    </div>
 
-    <h1>A world of happiness</h1>
-    <!-- <h2>According to xx, these factors combined bring us happiness. Explore the map to see how your country measure up?</h2> -->
-    <div id="legend"></div>
-
-    <div>
+    <div id="visualisation">
         <svg width="700" height="700"></svg>
     </div>
 
@@ -38,7 +41,7 @@
         var legend = new Legend()
 
         function highlightCountry(d) {
-            d3.selectAll('.highlight').classed("highlight", false);
+            // d3.selectAll('.highlight').classed("highlight", false);
             d3.selectAll('.country-' + d.id).classed("highlight", true);
         }
 
