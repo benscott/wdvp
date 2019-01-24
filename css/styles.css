@@ -9,159 +9,121 @@
     --text-grey: #8EA4B0;
 }
 
-        body {
-            background: #000F1A;
-            font-family: "Gill Sans", Arial, Helvetica, sans-serif;
-            font-size: 9px;
-            color: var(--text-grey);
-        }
+body {
+    background: #000F1A;
+    font-family: "Gill Sans", Arial, Helvetica, sans-serif;
+    font-size: 9px;
+    color: var(--text-grey);
+}
 
-        #info-box{
-            float: left;
-        }
+#header{
+    position: absolute;
+    top: 0;
+    left: 0;
+    padding: 20px;
+}
 
-        .yellow{
-            fill: #9D7800
-        }
+h1{
+    color: #fff;
+    font-size: 22px;
+    border-bottom: 1px solid #fff;
+    text-transform: uppercase;
+    margin: 0 0 20px 0;
+}
 
-        .light-orange{
-            fill: #955C00
-        }
-
-        .orange{
-            fill: #8A3C09
-        }
-
-        .red{
-            fill: #7A0022
-        }
-
-        .magenta{
-            fill: #800023
-        }
-
-        .purple{
-            fill: #390E2D
-        }
-
-        /* Grid layout */
-
-        /* .wrapper {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            grid-gap: 10px;
-            grid-auto-rows: minmax(100px, auto);
-        } */
-
-        h1{
-            color: #fff;
-            font-size: 30px;
-            border-bottom: 2px solid #fff;
-            text-transform: uppercase;
-            display: inline;
-        }
-
-        h2{
-            font-size: 20px;
-            /* border-bottom: 5px solid #fff; */
-        }
-
-        /* #countryTooltip {
-            position: absolute;
-            height: auto;
-            padding: 10px;
-            background-color: white;
-            pointer-events: none;
-            border: solid #ccc 1px;
-            color: #666;
-            font-size: 14px;
-            font-family: sans-serif;
-        }
-
-        #countryTooltip.hidden {
-            display: none;
-        } */
-
-        .selected {
-            fill: red !important;
-        }
-
-        .map-background {
-            fill: #0F2231 !important;
-
-            fill: #002948 !important;
-
-
-        }
-
-        .map-background2 {
-            fill: #001625 !important;
-
-
-
-
-        }
-
-        .highlight {
-            filter: brightness(2)!important;
-            /* -webkit-filter: brightness(125%);
-            -moz-filter: brightness(125%);
-            -o-filter: brightness(125%);
-            -ms-filter: brightness(125%); */
-             /* fill: #0F2231 !important; */
-        }
-
-        .map.highlight {
-            filter: brightness(100%);
-            fill: #223644 !important;
-        }
-
-        path,
-        .label {
-            cursor: pointer;
-        }
-
-        .label {
-            fill: #8EA4B0 !important;
-            font-size: 9px;
-        }
-
-        .bar{
-            /* width: 100px; */
-            height: 20px;
-            /* background: red; */
-            border: 2px solid black;
-        }
-
-
-        /* MAP */
-        path.map{
-            fill: #08101D !important;
-        }
-
-        /* #legend{
-            height: 300px;
-            border: 1px solid pink;
-        }
-
-        #country-info, #legend{
-            background: teal;
-        } */
-
-        #legend .title {
-            font-size: 16px;
-            fill: #fff!important;
-        }
-
-        #legend .label {
-            font-size: 16px;
-            fill: #fff!important;
-        }
+p{
+    font-size: 14px;
+    width: 300px;
+}
 
 #legend{
-    margin: 40px 20px;
-    position: absolute;
-    top: 50px;
+    margin-top: 80px;
+}
+
+#visualisation{
+    margin-left: 100px;
+    text-align: center;
+    position: relative;
+    z-index: 999;
+}
+
+/* Labels */
+.label {
+    fill: #8EA4B0;
+}
+.highlight.label{
+    fill: #fff;
+}
+
+/* Map */
+.map-background {
+    fill: #002948 !important;
+}
+
+path.map{
+    fill: #08101D !important;
+}
+
+.map.highlight {
+    /* filter: brightness(100%); */
+    /* fill: #223644 !important; */
+    fill: #426B89 !important;
+}
+
+.bar-group,
+.label,
+path.map {
+    cursor: pointer;
+}
+
+.bar-group.yellow{
+    fill: var(--yellow);
+}
+
+.bar-group.light-orange{
+    fill: var(--light-orange);
+}
+
+.bar-group.orange{
+    fill: var(--orange);
+}
+
+.bar-group.red{
+    fill: var(--red);
+}
+
+.bar-group.magenta{
+    fill: var(--magenta);
+}
+
+.bar-group.purple{
+    fill: var(--purple);
+}
+
+/* Selected */
+
+.bar-group.yellow .highlight{
+    fill: #FFF200;
+}
+
+.bar-group.light-orange .highlight{
+    fill: #FFB900;
+}
+
+.bar-group.orange .highlight{
+    fill: #FF7800;
+}
+
+.bar-group.red .highlight{
+    fill: #F7003F;
+}
+
+.bar-group.magenta .highlight{
+    fill: #FF0040;
+}
+
+.bar-group.purple .highlight{
+    fill: #73195B;
 }
 
  /* Customize the label (the container) */

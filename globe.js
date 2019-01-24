@@ -54,7 +54,7 @@ function Globe(svg, radius) {
             })
             // Event handlers
             .on("mouseover", function (d) {
-                if (d.properties.name) {
+                if (d.properties.happinessScore) {
                     highlightCountry(d)
                 }
             })
