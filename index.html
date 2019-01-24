@@ -10,16 +10,14 @@
 
     <title>A world of happiness</title>
 
-    <script src="https://d3js.org/d3.v4.js"></script>
-    <script src="http://d3js.org/topojson.v1.min.js"></script>
-    <script src="http://d3js.org/queue.v1.min.js"></script>
-    <script src="./js/core.min.js"></script>
-    <script src="d3-scale-radial.js"></script>
-    <script src="./globe.js"></script>
-    <script src="./stacked-bar-chart.js"></script>
-    <script src="./legend.js"></script>
+    <script src="./js/dist/d3.v4.js"></script>
+    <script src="./js/dist/topojson.v1.min.js"></script>
+    <script src="./js/dist/queue.v1.min.js"></script>
+    <script src="./js/dist/d3-scale-radial.js"></script>
+    <script src="./js/globe.js"></script>
+    <script src="./js/stacked-bar-chart.js"></script>
 
-    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="./css/styles.css">
 
 </head>
 
@@ -44,7 +42,6 @@
 
         var globe = new Globe(svg, innerRadius - 2)
         var bar = new StackedBarChart(svg, innerRadius)
-        var legend = new Legend()
 
         function highlightCountry(d) {
             // d3.selectAll('.highlight').classed("highlight", false);
