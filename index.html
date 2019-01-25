@@ -19,13 +19,27 @@
 
     <link rel="stylesheet" href="./css/styles.css?q=1">
 
+    <!--[if IE]>
+        <style>
+            #ie-only{
+                display: block!important;
+            }
+        </style>
+    <![endif]-->
+
 </head>
 
 <body>
 
+    <div id="ie-only">
+        Sorry, this visualisation will only display properly on modern browsers. Please view it on Firefox or Chrome.
+    </div>
+
     <div id="header">
         <h1>A world of happiness</h1>
-        <p>According to the UN World Happiness Report, these factors combined contribute to national happiness.</p>
+        <p>According to the <a href="http://worldhappiness.report" target="_blank">UN World Happiness Report</a>,
+            these factors combined contribute
+            to national happiness.</p>
         <p>Explore the globe and see how your country measures up.</p>
         <div id="legend"></div>
     </div>

@@ -16,6 +16,10 @@ body {
     color: var(--text-grey);
 }
 
+body a, body a:hover{
+    color: var(--text-grey);
+}
+
 #header{
     position: absolute;
     top: 0;
@@ -208,4 +212,16 @@ path.map {
   -ms-transform: rotate(45deg);
   transform: rotate(45deg);
   opacity: 0.4;
+}
+
+#ie-only{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    display: none;
+    background: var(--text-grey);
+    line-height: 20px;
+    color: #fff;
+    padding-left: 20px;
 }
